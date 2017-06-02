@@ -46,7 +46,7 @@ true_w=np.mat(np.linspace(-1,1,100)).transpose()
 train_y=train_x*true_w+0.3
 
 
-#迭代500次
+#迭代10000次
 for i in range(10000):
     #offset为随机梯度下降每次迭代train_x开始的下标
     offset=(i*batch_size)%(train_x.shape[0]-batch_size)
