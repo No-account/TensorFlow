@@ -1,6 +1,7 @@
 #自从看了vgg，我的心中有一个大胆的想法。。。。还未完成，目前只对一张图片进行卷积，池化，神经网络，然后生成128维的向量。未完待续utils是直接照搬的原vgg网的一个文件，就不贴出来了
 import tensorflow as tf
 import utils
+import numpy as np
 
 VGG_MEAN = [103.939, 116.779, 123.68]
 
@@ -8,36 +9,36 @@ class my_VGG:
     def __init__(self):
 
         self.conv1_1_filter = tf.Variable(tf.truncated_normal([3,3,3,64], 0.0, 0.01))
-        self.conv1_1_biases = tf.Variable(tf.truncated_normal([64], .0, .1))
+        self.conv1_1_biases = tf.Variable(tf.truncated_normal([64], .0, 0.01))
         self.conv1_2_filter = tf.Variable(tf.truncated_normal([3,3,64, 64], 0.0, 0.01))
-        self.conv1_2_biases = tf.Variable(tf.truncated_normal([64], .0, .1))
+        self.conv1_2_biases = tf.Variable(tf.truncated_normal([64], .0, 0.01))
 
         self.conv2_1_filter = tf.Variable(tf.truncated_normal([3, 3, 64, 128], 0.0, 0.01))
-        self.conv2_1_biases = tf.Variable(tf.truncated_normal([128], .0, .1))
+        self.conv2_1_biases = tf.Variable(tf.truncated_normal([128], .0, 0.01))
         self.conv2_2_filter = tf.Variable(tf.truncated_normal([3, 3, 128, 128], 0.0, 0.01))
-        self.conv2_2_biases = tf.Variable(tf.truncated_normal([128], .0, .1))
+        self.conv2_2_biases = tf.Variable(tf.truncated_normal([128], .0, 0.01))
 
         self.conv3_1_filter = tf.Variable(tf.truncated_normal([3, 3, 128, 256], 0.0, 0.01))
-        self.conv3_1_biases = tf.Variable(tf.truncated_normal([256], .0, .1))
+        self.conv3_1_biases = tf.Variable(tf.truncated_normal([256], .0, 0.01))
         self.conv3_2_filter = tf.Variable(tf.truncated_normal([3, 3, 256, 256], 0.0, 0.01))
-        self.conv3_2_biases = tf.Variable(tf.truncated_normal([256], .0, .1))
+        self.conv3_2_biases = tf.Variable(tf.truncated_normal([256], .0, 0.01))
 
         self.conv4_1_filter = tf.Variable(tf.truncated_normal([3, 3, 256, 512], 0.0, 0.01))
-        self.conv4_1_biases = tf.Variable(tf.truncated_normal([512], .0, .1))
+        self.conv4_1_biases = tf.Variable(tf.truncated_normal([512], .0, 0.01))
         self.conv4_2_filter = tf.Variable(tf.truncated_normal([3, 3, 512, 512], 0.0, 0.01))
-        self.conv4_2_biases = tf.Variable(tf.truncated_normal([512], .0, .1))
+        self.conv4_2_biases = tf.Variable(tf.truncated_normal([512], .0, 0.01))
 
         self.conv5_1_filter = tf.Variable(tf.truncated_normal([3, 3, 512, 512], 0.0, 0.01))
-        self.conv5_1_biases = tf.Variable(tf.truncated_normal([512], .0, .1))
+        self.conv5_1_biases = tf.Variable(tf.truncated_normal([512], .0, 0.01))
         self.conv5_2_filter = tf.Variable(tf.truncated_normal([3, 3, 512, 512], 0.0, 0.01))
-        self.conv5_2_biases = tf.Variable(tf.truncated_normal([512], .0, .1))
+        self.conv5_2_biases = tf.Variable(tf.truncated_normal([512], .0, 0.01))
 
         self.fc_weights1=tf.Variable(tf.truncated_normal([25088,4096], 0.0, 0.01))
-        self.fc_biases1=tf.Variable(tf.truncated_normal([4096], .0, .01))
+        self.fc_biases1=tf.Variable(tf.truncated_normal([4096], .0, 0.01))
         self.fc_weights2 = tf.Variable(tf.truncated_normal([4096,1000], 0.0, 0.01))
-        self.fc_biases2 = tf.Variable(tf.truncated_normal([1000], .0, .01))
+        self.fc_biases2 = tf.Variable(tf.truncated_normal([1000], .0, 0.01))
         self.fc_weights3 = tf.Variable(tf.truncated_normal([1000, 128], 0.0, 0.01))
-        self.fc_biases3 = tf.Variable(tf.truncated_normal([128], .0, .01))
+        self.fc_biases3 = tf.Variable(tf.truncated_normal([128], .0, 0.01))
 
 
     def conv_pool(self,img):
@@ -105,14 +106,44 @@ class my_VGG:
         return fc3
 
 
-
-img1 = utils.load_image("./test_data/tiger.jpeg")
-img1=img1.reshape(1,224,224,3)
+vgg=my_VGG()
 
 image1=tf.placeholder(tf.float32,[1,224,224,3])
-vgg=my_VGG()
-image2=vgg.conv_pool(image1)
-image3=vgg.fc_layer(image2)
+image2=tf.placeholder(tf.float32,[1,224,224,3])
+image3=tf.placeholder(tf.float32,[1,224,224,3])
+
+image_conv_pool1=vgg.conv_pool(image1)
+image_conv_pool2=vgg.conv_pool(image2)
+image_conv_pool3=vgg.conv_pool(image3)
+image_fc1=vgg.fc_layer(image_conv_pool1)
+image_fc2=vgg.fc_layer(image_conv_pool2)
+image_fc3=vgg.fc_layer(image_conv_pool3)
+
+loss=tf.reduce_sum(tf.square(image_fc1-image_fc2))/tf.reduce_sum(tf.square(image_fc1-image_fc3))
+
+train_step=tf.train.GradientDescentOptimizer(0.000000001).minimize(loss)
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
-    print(sess.run(image3,feed_dict={image1:img1}))
+    for j in range(1000):
+        m=0
+        n=0
+        while(True):
+            m = np.random.randint(1, 7)
+            n = np.random.randint(1, 7)
+            if(m!=n):
+                break
+        for i in range(100):
+            m_=0
+            n_=0
+            while(True):
+                m_=np.random.randint(1,20)
+                n_=np.random.randint(1,20)
+                if(m_!=n_):
+                    break
+            img1 = utils.load_image("./test_data/"+str(m)+"/saveImage"+str(m_)+".jpg")
+            img2 = utils.load_image("./test_data/"+str(m)+"/saveImage"+str(n_)+".jpg")
+            img3 = utils.load_image("./test_data/"+str(n)+"/saveImage"+str(m_)+".jpg")
+            batch1 = img1.reshape((1, 224, 224, 3))
+            batch2 = img2.reshape((1, 224, 224, 3))
+            batch3 = img3.reshape((1, 224, 224, 3))
+            print(sess.run([loss,train_step],feed_dict={image1:batch1,image2:batch2,image3:batch3}))
