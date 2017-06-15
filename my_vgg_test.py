@@ -112,23 +112,33 @@ loss = tf.reduce_sum(tf.square(image_fc1 - image_fc2))
 
 sess=tf.Session()
 sess.run(tf.global_variables_initializer())
-print("同一文件夹的比较")
+
+m=np.random.randint(1,9)
+m_=0
+n_=0
 i=1
 while(True):
-    img1 = utils.load_image("./test_data/" + str(i) + "/saveImage100.jpg")
-    img2 = utils.load_image("./test_data/" + str(i) + "/saveImage200.jpg")
-    print(i,"   ",sess.run([loss],feed_dict={image1:img1,image2:img2}))
+    m_=np.random.randint(1,259)
+    n_=np.random.randint(1,259)
+    img1=utils.load_image("./test_data/" + str(m) + "/saveImage" + str(m_) + ".jpg")
+    img2=utils.load_image("./test_data/" + str(i) + "/saveImage" + str(n_) + ".jpg")
+    batch1=img1.reshape(1,224,224,3)
+    batch2=img2.reshape(1,224,224,3)
+    print(i," ",m,"  ",sess.run(loss,feed_dict={image1:batch1,image2:batch2}))
     i+=1
-    if(i==8):
+    if(i==10):
         break
 
-print('第六个文件夹的和其他文件夹的比较\n')
+print("\n")
 i=1
 while(True):
-    img1 = utils.load_image("./test_data/7/saveImage70.jpg")
-    img2 = utils.load_image("./test_data/" + str(i) + "/saveImage50.jpg")
-    print(i,"   ",sess.run([loss],feed_dict={image1:img1,image2:img2}))
+    m_ = np.random.randint(1, 72)
+    n_ = np.random.randint(1, 259)
+    img1 = utils.load_image("./test_data/" + str(10) + "/saveImage" + str(m_) + ".jpg")
+    img2 = utils.load_image("./test_data/" + str(i) + "/saveImage" + str(n_) + ".jpg")
+    batch1=img1.reshape(1,224,224,3)
+    batch2=img2.reshape(1,224,224,3)
+    print(i," ","10","  ",sess.run(loss,feed_dict={image1:batch1,image2:batch2}))
     i+=1
-    if(i==8):
+    if(i==10):
         break
-
