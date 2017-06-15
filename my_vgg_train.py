@@ -144,24 +144,26 @@ for j in range(200):
     m = 0
     n = 0
     while (True):
-        m = np.random.randint(1, 6)
-        n = np.random.randint(1, 6)
+        m = np.random.randint(1, 9)
+        n = np.random.randint(1, 9)
         if (m != n):
             break
-    m_ = 0
-    n_ = 0
-    while (True):
-        m_ = np.random.randint(1, 259)
-        n_ = np.random.randint(1, 259)
-        if (m_ != n_):
-            break
-    img1 = utils.load_image("./test_data/" + str(m) + "/saveImage" + str(m_) + ".jpg")
-    img2 = utils.load_image("./test_data/" + str(m) + "/saveImage" + str(n_) + ".jpg")
-    img3 = utils.load_image("./test_data/" + str(n) + "/saveImage" + str(m_) + ".jpg")
-    batch1 = img1.reshape((1, 224, 224, 3))
-    batch2 = img2.reshape((1, 224, 224, 3))
-    batch3 = img3.reshape((1, 224, 224, 3))
-    for i in range(15):
-        print(sess.run([loss, train_step], feed_dict={image1: batch1, image2: batch2, image3: batch3}))
+    for i in range(50):
+        m_ = 0
+        n_ = 0
+        k_ = 0
+        while (True):
+            m_ = np.random.randint(1, 259)
+            n_ = np.random.randint(1, 259)
+            K_ = np.random.randint(1, 259)
+            if (m_ != n_):
+                break
+        img1 = utils.load_image("./test_data/" + str(m) + "/saveImage" + str(m_) + ".jpg")
+        img2 = utils.load_image("./test_data/" + str(m) + "/saveImage" + str(n_) + ".jpg")
+        img3 = utils.load_image("./test_data/" + str(n) + "/saveImage" + str(k_) + ".jpg")
+        batch1 = img1.reshape((1, 224, 224, 3))
+        batch2 = img2.reshape((1, 224, 224, 3))
+        batch3 = img3.reshape((1, 224, 224, 3))
+        print(j,"  ",i,"   ",sess.run([loss, train_step], feed_dict={image1: batch1, image2: batch2, image3: batch3}))
 save_npy(sess)
 sess.close()
