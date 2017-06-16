@@ -4,7 +4,7 @@ import numpy as np
 
 VGG_MEAN = [103.939, 116.779, 123.68]
 
-var_dict=np.load("./my_vgg.npy")
+var_dict=np.load("./my_vgg.npy").item()
 
 
 conv1_1_filter = tf.constant(var_dict['conv1_1_filter'])
@@ -98,7 +98,8 @@ def fc_layer(img):
     fc2 = tf.nn.bias_add(tf.matmul(relu1, fc_weights2), fc_biases2)
     relu2 = tf.nn.dropout(tf.nn.relu(fc2), 0.5)
     fc3 = tf.nn.bias_add(tf.matmul(relu2, fc_weights3), fc_biases3)
-    return fc3
+    relu=tf.nn.relu(fc3)
+    return relu
 
 image1 = tf.placeholder(tf.float32, [1, 224, 224, 3])
 image2 = tf.placeholder(tf.float32, [1, 224, 224, 3])
@@ -108,7 +109,7 @@ image_conv_pool2 = conv_pool(image2)
 image_fc1 = fc_layer(image_conv_pool1)
 image_fc2 = fc_layer(image_conv_pool2)
 
-loss = tf.reduce_sum(tf.square(image_fc1 - image_fc2))
+loss = tf.reduce_sum(tf.square(image_fc1 - image_fc2))/1000000000000000000000000000000
 
 sess=tf.Session()
 sess.run(tf.global_variables_initializer())
