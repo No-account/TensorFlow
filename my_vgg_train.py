@@ -96,7 +96,8 @@ def fc_layer(img):
     fc2 = tf.nn.bias_add(tf.matmul(relu1, fc_weights2), fc_biases2)
     relu2 = tf.nn.dropout(tf.nn.relu(fc2), 0.5)
     fc3 = tf.nn.bias_add(tf.matmul(relu2, fc_weights3), fc_biases3)
-    return fc3
+    relu=tf.nn.relu(fc3)
+    return relu
 
 
 def save_npy(sess, npy_path="./my_vgg.npy"):
@@ -140,7 +141,7 @@ loss = tf.reduce_sum(tf.square(image_fc1 - image_fc2)) / tf.reduce_sum(tf.square
 train_step = tf.train.GradientDescentOptimizer(0.1).minimize(loss)
 sess=tf.Session()
 sess.run(tf.global_variables_initializer())
-for j in range(200):
+for j in range(100):
     m = 0
     n = 0
     while (True):
@@ -149,9 +150,9 @@ for j in range(200):
         if (m != n):
             break
     for i in range(50):
-        m_ = 0
-        n_ = 0
-        k_ = 0
+        m_ = 1
+        n_ = 1
+        k_ = 1
         while (True):
             m_ = np.random.randint(1, 259)
             n_ = np.random.randint(1, 259)
